@@ -1,16 +1,20 @@
 package com.emo.matrix.lms.service;
 
+import com.emo.matrix.lms.dto.CourseDTO;
 import com.emo.matrix.lms.models.Admin;
 import com.emo.matrix.lms.models.Course;
 import com.emo.matrix.lms.models.Student;
 import com.emo.matrix.lms.repository.AdminRepository;
 import com.emo.matrix.lms.repository.StudentRepository;
+import com.emo.matrix.lms.utils.CourseUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -82,10 +86,10 @@ public class StudentService {
     }
 
     // Method to get courses by student ID
-    public Set<Course> getCoursesByStudentId(Long studentId) {
+    public Set<CourseDTO> getCoursesByStudentId(Long studentId) {
         Student student = studentRepository.findById(studentId).orElse(null);
         if (student != null) {
-            return student.getCourses();
+            return student.getCourses().stream().map(CourseUtil::toDTO).collect(Collectors.toSet());
         }
         return null;
     }

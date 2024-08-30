@@ -18,7 +18,7 @@ public class CourseDTO {
     private Set<String> quizs; // IDs of associated Quizzes
     private Set<Long> enrollments; // IDs of associated Enrollments
     private Set<String> students; // IDs of associated Students
-    private byte[] videoFiles; // Byte array for video files
+    private String videoFiles; // Byte array for video files
     private String createdBy;
     private Timestamp createdAt;
     private String updatedBy;
@@ -31,7 +31,7 @@ public class CourseDTO {
     // Constructor with fields
     public CourseDTO(Long id, String title, String description, String teacher, boolean isPrivate, boolean isPaid,
     		String admin, String department, Set<String> vidsteps, Set<String> assignments,
-                     Set<String> quizs, Set<Long> enrollments, Set<String> students, byte[] videoFiles,
+                     Set<String> quizs, Set<Long> enrollments, Set<String> students, String videoFiles,
                      String createdBy, Timestamp createdAt, String updatedBy, Timestamp updatedAt) {
         this.id = id;
         this.title = title;
@@ -158,11 +158,11 @@ public class CourseDTO {
         this.students = students;
     }
 
-    public byte[] getVideoFiles() {
+    public String getVideoFiles() {
         return videoFiles;
     }
 
-    public void setVideoFiles(byte[] videoFiles) {
+    public void setVideoFiles(String videoFiles) {
         this.videoFiles = videoFiles;
     }
 

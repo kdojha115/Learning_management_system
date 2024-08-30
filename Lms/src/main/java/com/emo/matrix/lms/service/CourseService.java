@@ -1,6 +1,7 @@
 package com.emo.matrix.lms.service;
 
 import com.emo.matrix.lms.dto.CourseDTO;
+import com.emo.matrix.lms.helper.FileUploadHelper;
 import com.emo.matrix.lms.models.*;
 import com.emo.matrix.lms.repository.*;
 import com.emo.matrix.lms.utils.CourseUtil;
@@ -26,6 +27,9 @@ public class CourseService {
     private final AssignmentRepository assignmentRepository;
     private final QuizRepository quizRepository;
     private final EnrollmentRepository enrollmentRepository;
+    
+    @Autowired
+    private FileUploadHelper fileUploadHelper;
 
     @Autowired
     public CourseService(CourseRepository courseRepository, StudentRepository studentRepository,
@@ -92,9 +96,8 @@ public class CourseService {
 //    }
 
     // Method to get all courses
-    public List<CourseDTO> getAllCourses() {
-        List<Course> courses = courseRepository.findAll();
-        return courses.stream().map(CourseUtil::toDTO).collect(Collectors.toList());
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
     }
 
     // Method to get a course by ID
@@ -164,23 +167,31 @@ public class CourseService {
         courseRepository.save(video);
     }
 
-    public Course uploadVideo(Long id, MultipartFile file) throws Exception {
-        Optional<Course> optionalCourse = courseRepository.findById(id);
-        if (optionalCourse.isEmpty()) {
-            throw new RuntimeException("Course not found with given ID");
-        }
+//    public Course uploadVideo(Long id, MultipartFile file) throws Exception {
+//        Optional<Course> optionalCourse = courseRepository.findById(id);
+//        if (optionalCourse.isEmpty()) {
+//            throw new RuntimeException("Course not found with given ID");
+//        }
+//
+//        Course course = optionalCourse.get();
+//        try {
+//            // Set the video file as bytes (consider handling large files differently)
+//            course.setVideoFiles(file.getBytes());
+//            courseRepository.save(course);
+//            return course;
+//        } catch (IOException e) {
+//            // Log and rethrow the exception
+//            throw new Exception("Failed to save video file", e);
+//        }
+//    }
 
-        Course course = optionalCourse.get();
-        try {
-            // Set the video file as bytes (consider handling large files differently)
-            course.setVideoFiles(file.getBytes());
-            courseRepository.save(course);
-            return course;
-        } catch (IOException e) {
-            // Log and rethrow the exception
-            throw new Exception("Failed to save video file", e);
-        }
-    }
+	public void uploadVideo(Long id,MultipartFile file) {
+		Optional<Course> course = courseRepository.findById(id);
+		Course c = course.get();
+		c.setVideoFiles(fileUploadHelper.fileName(file));
+		c.setUpdatedBy((c.getAdmin()).getName());
+		courseRepository.save(c);
+	}
 
 	
 }

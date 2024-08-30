@@ -58,9 +58,9 @@ public class Course {
 //	@Column(name = "video_files")
 //    private String videoFiles; // This could be a URL or a path to video files related to the course
 
-    @Lob
-    @Column(name = "video_files", columnDefinition = "BLOB",nullable = true)
-    private byte[] videoFiles;
+
+    @Column(name = "video_files", nullable = true)
+    private String videoFiles;
 
     
 	@Column(nullable = false)
@@ -91,7 +91,7 @@ public class Course {
     // Constructor using field
     public Course(Long id, String title, String description, Teacher teacher, boolean isPrivate, boolean isPaid,
     		Admin admin, Department department, Set<Vidstep> vidsteps, Set<Assignment> assignments, Set<Quiz> quizzes,
-    		Set<Enrollment> enrollments, Set<Student> students, byte[] videoFiles, String createdBy, Timestamp createdAt,
+    		Set<Enrollment> enrollments, Set<Student> students, String videoFiles, String createdBy, Timestamp createdAt,
     		String updatedBy, Timestamp updatedAt) {
     	super();
     	this.id = id;
@@ -130,9 +130,9 @@ public class Course {
 		return id;
 	}
 
-	public void setVideoFiles(byte[] videoFiles) {
-		this.videoFiles = videoFiles;
-	}
+//	public void setVideoFiles(String videoFiles) {
+//		this.videoFiles = videoFiles;
+//	}
 
 	public void setId(Long id) {
 		this.id = id;
@@ -235,13 +235,13 @@ public class Course {
 		this.enrollments = enrollments;
 	}
 
-//	public String getVideoFiles() {
-//		return videoFiles;
-//	}
-//
-//	public void setVideoFiles(String videoFiles) {
-//		this.videoFiles = videoFiles;
-//	}
+	public String getVideoFiles() {
+		return videoFiles;
+	}
+
+	public void setVideoFiles(String videoFiles) {
+		this.videoFiles = videoFiles;
+	}
 
 	public String getCreatedBy() {
 		return createdBy;
