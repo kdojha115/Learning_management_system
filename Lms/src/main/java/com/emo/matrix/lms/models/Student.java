@@ -39,7 +39,7 @@ public class Student {
     private String password;
 
     @Column(nullable = true)
-    private boolean isIndependent;  // Indicates if the student signed up independently
+    private boolean isIndependent = true;  // Indicates if the student signed up independently
 
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = true)  // This line is added to fix the issue

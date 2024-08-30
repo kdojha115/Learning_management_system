@@ -39,7 +39,7 @@ public class Teacher {
     private String password;
 
     @Column(nullable = false)
-    private boolean isIndependent; // Indicates if the teacher operates independently
+    private boolean isIndependent = true; // Indicates if the teacher operates independently
 
     @ManyToOne
     @JoinColumn(name = "admin_id",nullable = true)

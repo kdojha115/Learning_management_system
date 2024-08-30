@@ -34,7 +34,7 @@ public class Admin {
     @Column(unique = true, nullable = false)
     private String phoneNumber;
 
-    @JsonIgnore
+//    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -42,13 +42,16 @@ public class Admin {
     private boolean isSuperAdmin = false;
 
     @OneToMany(mappedBy = "admin")
+    @Column(nullable = true)
     private Set<Teacher> teachers;
 
     @OneToMany(mappedBy = "admin")
+    @Column(nullable = true)
     private Set<Student> students;
     
     
     @OneToMany(mappedBy = "admin")
+    @Column(nullable = true)
     private Set<Course> courses;
     
 //    @ManyToMany(fetch = FetchType.EAGER)

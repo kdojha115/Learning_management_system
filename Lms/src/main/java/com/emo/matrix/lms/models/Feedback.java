@@ -33,10 +33,14 @@ public class Feedback {
     @OneToMany(mappedBy = "feedback")
     private Set<FeedbackQuestion> feedbackQuestions; // Mapping to FeedbackQuestion table
 
-    private int rating; // Rating given by the student
+    private int rating;// Rating given by the student
+    
+    private String content; // or other field name
+
+
 
     // Constructor with fields
-    public Feedback(Long id, Course course, Teacher teacher, Student student, Admin createdBy, LocalDateTime createdAt, Set<FeedbackQuestion> feedbackQuestions, int rating) {
+    public Feedback(Long id, Course course, Teacher teacher, Student student, Admin createdBy, LocalDateTime createdAt, Set<FeedbackQuestion> feedbackQuestions, int rating,String content) {
         this.id = id;
         this.course = course;
         this.teacher = teacher;
@@ -45,6 +49,7 @@ public class Feedback {
         this.createdAt = createdAt;
         this.feedbackQuestions = feedbackQuestions;
         this.rating = rating;
+        this.content = content;
     }
 
     // Default Constructor
@@ -52,6 +57,13 @@ public class Feedback {
     }
 
     // Getters and Setters
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
     public Long getId() {
         return id;
     }

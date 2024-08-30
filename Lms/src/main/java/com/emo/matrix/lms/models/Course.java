@@ -25,7 +25,7 @@ public class Course {
     private Teacher teacher; // Optional if the course is posted by an independent teacher
 
     @Column(nullable = false)
-    private boolean isPrivate; // If true, only students under the admin of the teacher can access; otherwise, it's public
+    private boolean isPrivate = false; // If true, only students under the admin of the teacher can access; otherwise, it's public
 
     @Column(nullable = false)
     private boolean isPaid; // If true, the course requires payment; otherwise, it's free
