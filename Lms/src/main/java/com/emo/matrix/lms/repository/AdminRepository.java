@@ -1,6 +1,8 @@
 package com.emo.matrix.lms.repository;
 
 import com.emo.matrix.lms.models.Admin;
+import com.emo.matrix.lms.models.Teacher;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -14,7 +16,7 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     // Check if a SuperAdmin exists
     boolean existsByIsSuperAdminTrue();
-	Optional<Admin> findById(Admin admin);
+	Optional<String> findByName(String admin);
     
     
 }
