@@ -1,5 +1,6 @@
 package com.emo.matrix.lms.controller;
 
+import com.emo.matrix.lms.dto.CourseDTO;
 import com.emo.matrix.lms.dto.StudentDTO;
 import com.emo.matrix.lms.exception.ResourceNotFoundException;
 import com.emo.matrix.lms.models.Course;
@@ -124,10 +125,10 @@ public class StudentController {
 
     // Get courses by student ID
     @GetMapping("/{id}/courses")
-    public ResponseEntity<Set<Course>> getCoursesByStudentId(@PathVariable Long id) {
-        Set<Course> courses = studentService.getCoursesByStudentId(id);
-        if (courses != null) {
-            return ResponseEntity.ok(courses);
+    public ResponseEntity<Set<CourseDTO>> getCoursesByStudentId(@PathVariable Long id) {
+        Set<CourseDTO> courseDTOs = studentService.getCoursesByStudentId(id);
+        if (courseDTOs != null) {
+            return ResponseEntity.ok(courseDTOs);
         } else {
             return ResponseEntity.notFound().build();
         }
