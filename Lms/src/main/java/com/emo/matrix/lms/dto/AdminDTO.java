@@ -9,7 +9,7 @@ public class AdminDTO {
     private String name;
     private String email; // Optional
     private String phoneNumber;
-    private boolean isSuperAdmin;
+    private boolean superAdmin;
     private Set<String> teachers; // List of teacher IDs associated with this admin
     private Set<String> students; // List of student IDs associated with this admin
     private Set<String> courses; // List of course IDs associated with this admin
@@ -18,19 +18,18 @@ public class AdminDTO {
     private String updatedBy;
     private Timestamp updatedAt;
 
-    // Constructors
+    // Default Constructor
+    public AdminDTO() {}
 
-    public AdminDTO() {
-    }
-
-    public AdminDTO(Long id, String name, String email, String phoneNumber, boolean isSuperAdmin, 
+    // Parameterized Constructor
+    public AdminDTO(Long id, String name, String email, String phoneNumber, boolean superAdmin, 
                     Set<String> teachers, Set<String> students, Set<String> courses, 
                     String createdBy, Timestamp createdAt, String updatedBy, Timestamp updatedAt) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.isSuperAdmin = isSuperAdmin;
+        this.superAdmin = superAdmin;
         this.teachers = teachers;
         this.students = students;
         this.courses = courses;
@@ -41,7 +40,6 @@ public class AdminDTO {
     }
 
     // Getters and Setters
-
     public Long getId() {
         return id;
     }
@@ -75,11 +73,11 @@ public class AdminDTO {
     }
 
     public boolean isSuperAdmin() {
-        return isSuperAdmin;
+        return superAdmin;
     }
 
-    public void setSuperAdmin(boolean isSuperAdmin) {
-        this.isSuperAdmin = isSuperAdmin;
+    public void setSuperAdmin(boolean superAdmin) {
+        this.superAdmin = superAdmin;
     }
 
     public Set<String> getTeachers() {

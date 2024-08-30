@@ -13,29 +13,44 @@ public class FeedbackDTO {
     private LocalDateTime createdAt; // Timestamp when the feedback was created
     private Set<String> feedbackQuestions; // Mapping to FeedbackQuestion references as Strings
     private int rating; // Rating given by the student
-
+    private String content;
+    
     // Default Constructor
     public FeedbackDTO() {
     }
 
-    // Constructor with fields
-    public FeedbackDTO(Long id, String course, String teacher, String student, String createdBy, LocalDateTime createdAt, Set<String> feedbackQuestions, int rating) {
-        this.id = id;
-        this.course = course;
-        this.teacher = teacher;
-        this.student = student;
-        this.createdBy = createdBy;
-        this.createdAt = createdAt;
-        this.feedbackQuestions = feedbackQuestions;
-        this.rating = rating;
-    }
+    
 
-    // Getters and Setters
+    public FeedbackDTO(Long id, String course, String teacher, String student, String createdBy,
+			LocalDateTime createdAt, Set<String> feedbackQuestions, int rating, String content) {
+		super();
+		this.id = id;
+		this.course = course;
+		this.teacher = teacher;
+		this.student = student;
+		this.createdBy = createdBy;
+		this.createdAt = createdAt;
+		this.feedbackQuestions = feedbackQuestions;
+		this.rating = rating;
+		this.content = content;
+	}
+
+	// Getters and Setters
+    
+    
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public void setId(Long id) {
         this.id = id;
     }
 
