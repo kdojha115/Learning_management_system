@@ -1,93 +1,95 @@
 package com.emo.matrix.lms.controller;
 
+import com.emo.matrix.lms.dto.AdminDTO;
 import com.emo.matrix.lms.exception.ResourceNotFoundException;
 import com.emo.matrix.lms.models.Admin;
-import com.emo.matrix.lms.models.Teacher;
-import com.emo.matrix.lms.repository.AdminRepository;
-import com.emo.matrix.lms.repository.TeacherRepository;
 import com.emo.matrix.lms.service.AdminService;
+import com.emo.matrix.lms.utils.AdminUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
+	
+	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private AdminService adminService;
-    
+
     @Autowired
-    private TeacherRepository teacherRepository;
-    
-    @Autowired
-    private AdminRepository adminRepository;
-    
+    private AdminUtil adminUtil;
+
     @GetMapping("/")
-    public ResponseEntity<List<Admin>> getAllAdmins() {
+    public ResponseEntity<List<AdminDTO>> getAllAdmins() {
         List<Admin> admins = adminService.getAllAdmins();
-        return ResponseEntity.ok(admins);
+        List<AdminDTO> adminDTOs = admins.stream()
+                .map(adminUtil::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(adminDTOs);
     }
 
-    // Create a new Admin
     @PostMapping("/create")
-    public ResponseEntity<Admin> createAdmin(@RequestBody Admin admin) {
+    public ResponseEntity<AdminDTO> createAdmin(@RequestBody Admin admin) {
+//        Admin admin = adminUtil.toEntity(adminDTO);
+        log.debug("Password received: {}", admin.getPassword()); 
         Admin createdAdmin = adminService.createAdmin(admin);
-        return ResponseEntity.ok(createdAdmin);
+        AdminDTO createdAdminDTO = adminUtil.toDTO(createdAdmin);
+        return ResponseEntity.ok(createdAdminDTO);
     }
 
-    // Get Admin by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Admin> getAdminById(@PathVariable Long id) {
+    public ResponseEntity<AdminDTO> getAdminById(@PathVariable Long id) {
         Optional<Admin> admin = adminService.findAdminById(id);
         if (admin.isPresent()) {
-            return ResponseEntity.ok(admin.get());
+            AdminDTO adminDTO = adminUtil.toDTO(admin.get());
+            return ResponseEntity.ok(adminDTO);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    // Update an Admin
     @PutMapping("/{id}")
-    public ResponseEntity<Admin> updateAdmin(@PathVariable Long id, @RequestBody Admin adminDetails) {
+    public ResponseEntity<AdminDTO> updateAdmin(@PathVariable Long id, @RequestBody Admin admin) {
         try {
-            Admin updatedAdmin = adminService.updateAdmin(id, adminDetails);
-            return ResponseEntity.ok(updatedAdmin);
+//            Admin adminDetails = adminUtil.toEntity(admin);
+            Admin updatedAdmin = adminService.updateAdmin(id, admin);
+            AdminDTO updatedAdminDTO = adminUtil.toDTO(updatedAdmin);
+            return ResponseEntity.ok(updatedAdminDTO);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    // Approve a Teacher
     @PostMapping("/{id}/approve/teacher/{teacherId}")
-    public ResponseEntity<Teacher> approveTeacher(@PathVariable Long teacherId, @PathVariable Long id) {
+    public ResponseEntity<String> approveTeacher(@PathVariable Long id, @PathVariable Long teacherId) {
         try {
-        	Admin admin = adminRepository.findById(id).get();
-        	Teacher teacher = teacherRepository.findById(teacherId).get();
-            adminService.approveTeacher(teacherId,id);
-            return ResponseEntity.ok(teacher);
+            adminService.approveTeacher(teacherId, id);
+            return ResponseEntity.ok("Teacher account id " + teacherId + " approved by Admin Id " + id);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    
-
-    // Delete an Admin
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAdmin(@PathVariable Long id) {
         try {
-        	if(adminRepository.existsById(id)  ) {
-        		adminService.deleteAdmin(id);
-        		return ResponseEntity.ok("Admin account with id " + id + " deleted successfully!.");
-        	}
-        	else {
-        		String errorMessage = "Admin not found with id " + id;
-                return ResponseEntity.badRequest().body(errorMessage);
-        	}
+            if (adminService.existsById(id)) {
+                adminService.deleteAdmin(id);
+                return ResponseEntity.ok("Admin account with id " + id + " deleted successfully!");
+            } else {
+                return ResponseEntity.badRequest().body("Admin not found with id " + id);
+            }
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
