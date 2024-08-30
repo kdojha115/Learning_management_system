@@ -1,12 +1,15 @@
 package com.emo.matrix.lms.service;
 
+import com.emo.matrix.lms.models.Admin;
 import com.emo.matrix.lms.models.Course;
 import com.emo.matrix.lms.models.Student;
+import com.emo.matrix.lms.repository.AdminRepository;
 import com.emo.matrix.lms.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -14,6 +17,9 @@ public class StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
+    
+    @Autowired
+    private AdminRepository adminRepository;
 
     // Method to retrieve all students
     public List<Student> getAllStudents() {
@@ -48,7 +54,7 @@ public class StudentService {
             if (studentDetails.getPassword() != null) {
                 existingStudent.setPassword(studentDetails.getPassword());
             }
-            if (studentDetails.getIsIndependent() != null) { // Assuming isIndependent is a Boolean
+            if (studentDetails.getIndependent()) { // Assuming isIndependent is a Boolean
                 existingStudent.setIsIndependent(studentDetails.getIndependent());
             }
             if (studentDetails.getAdmin() != null) {
@@ -83,4 +89,65 @@ public class StudentService {
         }
         return null;
     }
+
+	public Optional<Student> findStudentById(Long id) {
+		// TODO Auto-generated method stub
+		return studentRepository.findById(id);
+	}
+
+	public Student createdStudentByAdmin(Student student, Long adminId) {
+		
+		Optional<Admin> admin = adminRepository.findById(adminId);
+		if(adminId != null) {
+			Admin a = admin.get();
+			student.setIsIndependent(false);
+			student.setCreatedBy(a.getName());
+			student.setAdmin(a);
+		}
+		return studentRepository.save(student);
+	}
+
+	public Student updateStudentByAdmin(Long id, Long adminId, Student student) {
+		
+		Optional<Admin> admin = adminRepository.findById(adminId);
+		if(adminId != null) {
+			Admin a = admin.get();
+			String name = a.getName();
+//			System.out.println(name);
+			Student existingStudent = studentRepository.findById(id).orElse(null);
+
+	        if (existingStudent != null) {
+	            // Update fields only if they are provided (non-null or non-empty)
+	            if (student.getName() != null) {
+	                existingStudent.setName(student.getName());
+	            }
+	            if (student.getPhoneNumber() != null) {
+	                existingStudent.setPhoneNumber(student.getPhoneNumber());
+	            }
+	            if (student.getEmail() != null) {
+	                existingStudent.setEmail(student.getEmail());
+	            }
+	            if (student.getPassword() != null) {
+	                existingStudent.setPassword(student.getPassword());
+	            }
+	            
+	            if (student.getDepartment() != null) {
+	                existingStudent.setDepartment(student.getDepartment());
+	            }
+	            if (student.getCourses() != null && !student.getCourses().isEmpty()) {
+	                existingStudent.setCourses(student.getCourses());
+	            }
+	            
+	            existingStudent.setUpdatedBy(name);
+
+//				System.out.println(existingStudent.getUpdatedBy());
+	            existingStudent.setAdmin(a);
+
+	            // Save and return the updated student
+	            return studentRepository.save(existingStudent);
+	        }
+			
+		}
+		return null;
+	}
 }

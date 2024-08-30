@@ -1,146 +1,172 @@
 package com.emo.matrix.lms.service;
 
+import com.emo.matrix.lms.dto.TeacherDTO;
 import com.emo.matrix.lms.exception.ResourceNotFoundException;
+import com.emo.matrix.lms.models.Admin;
 import com.emo.matrix.lms.models.Course;
 import com.emo.matrix.lms.models.Teacher;
+import com.emo.matrix.lms.repository.AdminRepository;
 import com.emo.matrix.lms.repository.CourseRepository;
 import com.emo.matrix.lms.repository.TeacherRepository;
+import com.emo.matrix.lms.utils.TeacherUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @Service
 public class TeacherService {
 
     @Autowired
     private TeacherRepository teacherRepository;
-
+    
     @Autowired
     private CourseRepository courseRepository;
     
+    @Autowired
+    private AdminRepository adminRepository;
 
-    /**
-     * Creates a new teacher.
-     *
-     * @param teacher the Teacher object to be created
-     * @return the created Teacher object
-     */
     public Teacher createTeacher(Teacher teacher) {
-        teacher.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-        teacher.setCreatedBy(teacher.getName());
-        teacher.setApproved(false);  // Default to false
-        teacher.setIndependent(true);
-//        teacher.setAdmin(teacher.getAdmin());
+        return teacherRepository.save(teacher);
+    }
+    
+    public Teacher createdTeacherByAdmin(Teacher teacher, Long adminId) {
+    	Optional<Admin> admin = adminRepository.findById(adminId);
+    	if(adminId != null) {
+    		Admin a = admin.get();
+    		teacher.setIndependent(false);
+    		teacher.setApproved(true);
+    		teacher.setCreatedBy(a.getName());
+    		teacher.setAdmin(a);
+    	}
         return teacherRepository.save(teacher);
     }
 
-    /**
-     * Finds a teacher by ID.
-     *
-     * @param teacherId the ID of the teacher to be found
-     * @return the Teacher object
-     * @throws ResourceNotFoundException if the teacher with the given ID does not exist
-     */
-    public Teacher findTeacherById(Long teacherId) {
-        return teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with id " + teacherId));
-    }
+    public Teacher updateTeacher(Long id, Teacher teacherDTO) {
+        Teacher existingTeacher = teacherRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Teacher not found with id: " + id)
+        );
 
-    /**
-     * Deletes a teacher by ID.
-     *
-     * @param teacherId the ID of the teacher to be deleted
-     */
-    public void deleteTeacher(Long teacherId) {
+        // Update fields only if they are provided (non-null or non-empty)
+        if (teacherDTO.getName() != null) {
+            existingTeacher.setName(teacherDTO.getName());
+        }
+        if (teacherDTO.getEmail() != null) {
+            existingTeacher.setEmail(teacherDTO.getEmail());
+        }
+        if (teacherDTO.getPhoneNumber() != null) {
+            existingTeacher.setPhoneNumber(teacherDTO.getPhoneNumber());
+        }
+        if (teacherDTO.isIndependent()) { // Assuming independent is a Boolean
+            existingTeacher.setIndependent(teacherDTO.isIndependent());
+        }
+        // Add any additional related entities update logic here if needed
 
-    	teacherRepository.deleteById(teacherId);
-    }
-
-    /**
-     * Updates an existing teacher.
-     *
-     * @param teacherId      the ID of the teacher to be updated
-     * @param teacherDetails the Teacher object containing updated details
-     * @return the updated Teacher object
-     * @throws ResourceNotFoundException if the teacher with the given ID does not exist
-     */
-    public Teacher updateTeacher(Long teacherId, Teacher teacherDetails) {
-        Teacher existingTeacher = findTeacherById(teacherId);
-
-        // Update fields only if they are provided (non-null)
-        if (teacherDetails.getName() != null) {
-            existingTeacher.setName(teacherDetails.getName());
+        // Update other fields like createdBy, updatedBy, etc., if needed
+        if (teacherDTO.getCreatedBy() != null) {
+            existingTeacher.setCreatedBy(teacherDTO.getCreatedBy());
         }
-        if (teacherDetails.getEmail() != null) {
-            existingTeacher.setEmail(teacherDetails.getEmail());
+        if (teacherDTO.getCreatedAt() != null) {
+            existingTeacher.setCreatedAt(teacherDTO.getCreatedAt());
         }
-        if (teacherDetails.getPhoneNumber() != null) {
-            existingTeacher.setPhoneNumber(teacherDetails.getPhoneNumber());
+        if (teacherDTO.getUpdatedBy() != null) {
+            existingTeacher.setUpdatedBy(teacherDTO.getUpdatedBy());
         }
-        if (teacherDetails.getPassword() != null) {
-            existingTeacher.setPassword(teacherDetails.getPassword());
+        if (teacherDTO.getUpdatedAt() != null) {
+            existingTeacher.setUpdatedAt(teacherDTO.getUpdatedAt());
         }
-        if (teacherDetails.isIndependent()) { // Assuming isIndependent is a Boolean
-            existingTeacher.setIndependent(teacherDetails.isIndependent());
-        }
-        if (teacherDetails.getAdmin() != null) {
-            existingTeacher.setAdmin(teacherDetails.getAdmin());
-        }
-        if (teacherDetails.getDepartment() != null) {
-            existingTeacher.setDepartment(teacherDetails.getDepartment());
-        }
-        if (teacherDetails.getCourses() != null && !teacherDetails.getCourses().isEmpty()) {
-            existingTeacher.setCourses(teacherDetails.getCourses());
-        }
-        if (teacherDetails.getAssignments() != null && !teacherDetails.getAssignments().isEmpty()) {
-            existingTeacher.setAssignments(teacherDetails.getAssignments());
-        }
-        if (teacherDetails.getQuizzes() != null && !teacherDetails.getQuizzes().isEmpty()) {
-            existingTeacher.setQuizzes(teacherDetails.getQuizzes());
-        }
-        if (teacherDetails.getFeedbacks() != null && !teacherDetails.getFeedbacks().isEmpty()) {
-            existingTeacher.setFeedbacks(teacherDetails.getFeedbacks());
+        if (teacherDTO.isApproved() != true) { // Assuming approved is a Boolean
+            existingTeacher.setApproved(teacherDTO.isApproved());
         }
 
-        // Update metadata
-        existingTeacher.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        if (teacherDetails.getName() != null) {
-            existingTeacher.setUpdatedBy(teacherDetails.getName());
-        }
-
+        // Save and return the updated teacher
         return teacherRepository.save(existingTeacher);
+  
+    }
+
+//    public TeacherDTO getTeacherById(Long id) {
+//        Teacher teacher = teacherRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with id: " + id));
+//        return TeacherUtil.toDTO(teacher);
+//    }
+//
+    public List<Teacher> getAllTeachers() {
+        return teacherRepository.findAll();
     }
 
 
-    /**
-     * Assigns a course to a teacher.
-     *
-     * @param teacherId the ID of the teacher
-     * @param courseId  the ID of the course to be assigned
-     * @throws ResourceNotFoundException if the teacher or course does not exist
-     */
-    public void assignCourseToTeacher(Long teacherId, Long courseId) {
-        Teacher teacher = findTeacherById(teacherId);
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id " + courseId));
 
-        Set<Course> courses = teacher.getCourses();
-        courses.add(course);
-        teacher.setCourses(courses);
-        teacherRepository.save(teacher);
+    public Teacher assignCourseToTeacher(Long teacherId, Long courseId) {
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with id: " + teacherId));
+        // Assume CourseRepository is available and you can fetch course by ID
+         Course course = courseRepository.findById(courseId).orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
+         teacher.getCourses().add(course);
+         course.setTeacher(teacher);
+        return teacherRepository.save(teacher);
     }
 
-	public List<Teacher> getAllAdmins() {
+	public Optional<Teacher> findTeacherById(Long id) {
 		// TODO Auto-generated method stub
-		return teacherRepository.findAll();
+		return teacherRepository.findById(id);
 	}
 
-	public Object findById(Long id) {
+	public boolean existsById(Long id) {
 		// TODO Auto-generated method stub
+		return teacherRepository.existsById(id);
+	}
+
+	public void deleteTeacher(Long id) {
+		// TODO Auto-generated method stub
+		teacherRepository.deleteById(id);
+		
+	}
+
+	public Teacher updateTeacherByAdmin(Long id, Long adminId, Teacher teacher) {
+		
+		Optional<Admin> admin = adminRepository.findById(adminId);
+		if(adminId != null) {
+			Admin a = admin.get();
+			Teacher existingTeacher = teacherRepository.findById(id).orElseThrow(
+		            () -> new ResourceNotFoundException("Teacher not found with id: " + id)
+		        );
+
+		        // Update fields only if they are provided (non-null or non-empty)
+		        if (teacher.getName() != null) {
+		            existingTeacher.setName(teacher.getName());
+		        }
+		        if (teacher.getEmail() != null) {
+		            existingTeacher.setEmail(teacher.getEmail());
+		        }
+		        if (teacher.getPhoneNumber() != null) {
+		            existingTeacher.setPhoneNumber(teacher.getPhoneNumber());
+		        }
+		        
+		        // Add any additional related entities update logic here if needed
+
+		        // Update other fields like createdBy, updatedBy, etc., if needed
+		        if (teacher.getCreatedBy() != null) {
+		            existingTeacher.setCreatedBy(teacher.getCreatedBy());
+		        }
+		        if (teacher.getCreatedAt() != null) {
+		            existingTeacher.setCreatedAt(teacher.getCreatedAt());
+		        }
+		        if (teacher.getUpdatedBy() != null) {
+		            existingTeacher.setUpdatedBy(teacher.getUpdatedBy());
+		        }
+		        if (teacher.getUpdatedAt() != null) {
+		            existingTeacher.setUpdatedAt(teacher.getUpdatedAt());
+		        }
+		        if (teacher.isApproved() != true) { // Assuming approved is a Boolean
+		            existingTeacher.setApproved(teacher.isApproved());
+		        }
+		        
+		        existingTeacher.setAdmin(a);
+
+		        // Save and return the updated teacher
+		        return teacherRepository.save(existingTeacher);
+		}
 		return null;
 	}
-
 }
